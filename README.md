@@ -16,9 +16,9 @@ This Knockout pool works as follows:
 - Page to view everyones picks after tip-off each day
 
 
-## Usages
+## Project Management
 
-- React.js | UI library
-- Node.js | Development environment
-- SQL | Database
-- GitGuardian | Secrets security
+React.js | UI library
+Node.js | Development environment
+SQL | Database
+GitGuardian | Secrets security
