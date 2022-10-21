@@ -10,15 +10,17 @@ This Knockout pool works as follows:
 4. Last person standing wins
 
 ## Objectives
-- Secure user acccount sign in
-- User profile with a team selection interface
-- Automatically mport teams from an API
-- Page to view everyones picks after tip-off each day
+Allow users to sign into their own account in a secure fashion with 'forgot my password' capabilities.
 
+Each user will have a profile displaying their information as well as a team selector interface. Users will be able to view all the games for that day, and be restricted to only picking teams they have not used yet.
+
+Games for each day, as well as game results will be automated through an API to reduce manual enforcement of the website. A backup (feature flag) should be made readily available to revert to a non-API data transfer strategy. 
+
+A page for every user to view all other users picks will be made available after tip-off each day.
 
 ## Project Management
 
-React.js | UI library
-Node.js | Development environment
-SQL | Database
-GitGuardian | Secrets security
+- React.js | UI library
+- Node.js | Development environment
+- SQL | Database
+- GitGuardian | Secrets security
