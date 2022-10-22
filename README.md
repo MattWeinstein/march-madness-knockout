@@ -20,7 +20,8 @@ A page for every user to view all other users picks will be made available after
 
 ## Project Management
 
-- React.js | UI library
+- React.js | Frontend library
+- Styled Components | Styling
 - Node.js | Development environment
 - SQL | Database
 - GitGuardian | Secrets security
