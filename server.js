@@ -27,6 +27,7 @@ app.use(session({
   saveUninitialized: false,
   store: new SQLiteStore({ db: 'user_credentials.db', dir: './var/db' })
 }));
+
 app.use(passport.authenticate('session'));
 
 passport.use(new LocalStrategy(function verify(username, password, cb) {
