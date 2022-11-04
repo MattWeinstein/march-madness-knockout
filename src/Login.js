@@ -36,11 +36,15 @@ function Login () {
         setPassword(event.target.value)
     }
 
-    console.log(username)
-
-
     const loginHandler = () => {
-    Axios.post('http://localhost:3001/login',{
+        Axios.post('http://localhost:3001/login')
+        .then((response) => {
+            console.log(response)
+        })    
+    }
+
+    const addUserHandler = () => {
+    Axios.post('http://localhost:3001/adduser',{
         usernameEntered: username,
         passwordEntered: password
     })
@@ -59,7 +63,8 @@ function Login () {
                     <Label >Password</Label>
                     <LoginInput type="text" name ="password" placeholder="Password" onChange={passwordHandler}></LoginInput>
                 </LoginInputContainer>
-                <button onClick={loginHandler} id='loginButton'>Register</button>
+                <button onClick={loginHandler} id='loginButton'>Check Login</button>
+                <button onClick={addUserHandler} id='loginButton'>Add User</button>
             </LoginContainer>
         </section>
     )
