@@ -1,5 +1,7 @@
 import styled from 'styled-components'
+import Axios from 'axios';
 import './Login.css'
+import { useState } from 'react';
 
 const Label = styled.label`
     color: blue
@@ -21,21 +23,45 @@ const LoginInput = styled.input`
 `
 const LoginInputContainer = styled.div``
 
+
 function Login () {
+    const [username,setUsername] = useState('')
+    const [password,setPassword] = useState('')
+
+    const usernameHandler = (event) => {
+        setUsername(event.target.value)
+    }
+
+    const passwordHandler = (event) => {
+        setPassword(event.target.value)
+    }
+
+    console.log(username)
+
+
+    const loginHandler = () => {
+    Axios.post('http://localhost:3001/login',{
+        usernameEntered: username,
+        passwordEntered: password
+    })
+        .then((response) => {
+            console.log(response)
+        })
+    }
     return(
-        <form method="post">
+        <section>
             <LoginContainer>
                 <LoginInputContainer>
-                    <Label for="nameLogin">Username</Label>
-                    <LoginInput type="text"  name ="username" placeholder="Username" required></LoginInput>
+                    <Label >Username</Label>
+                    <LoginInput type="text"  name ="username" placeholder="Username" onChange={usernameHandler}></LoginInput>
                 </LoginInputContainer>
                 <LoginInputContainer>
-                    <Label for="passwordLogin">Password</Label>
-                    <LoginInput type="text" name ="password" placeholder="Password" required></LoginInput>
+                    <Label >Password</Label>
+                    <LoginInput type="text" name ="password" placeholder="Password" onChange={passwordHandler}></LoginInput>
                 </LoginInputContainer>
-                <button type='submit' id='loginButton'class="button">Register</button>
+                <button onClick={loginHandler} id='loginButton'>Register</button>
             </LoginContainer>
-        </form>
+        </section>
     )
 }
 
