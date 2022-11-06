@@ -26,26 +26,31 @@ app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: false,
-  store: new SQLiteStore({ db: 'user_credentials.db', dir: './var/db' })
+  // store: new SQLiteStore({ db: 'user_credentials.db', dir: './var/db' })
 }));
 
 app.use(passport.authenticate('session'));
 
-passport.use(new LocalStrategy(function verify(username, password, done) {
-    db.get('SELECT * FROM user_credentials WHERE username = ?', [ username ], function(err, user) {
-      if (err)  return done(err); 
-      if (!user) return done(null, false); 
-  
-      bcrypt.compare(password, user.password,(err, result) => {
+passport.use(new LocalStrategy(
+  function verify(username, password, done) {
+    db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[username],
+        function(err, user) {
         if (err)  return done(err); 
-        if (result === true) {
-            return done(user, false);
-        }else {
-            return done(null, false);
-        }
+        if (!user) return done(null, false); 
+        if (user) return done(user, user); 
 
-    });
-  })}));
+        
+        // bcrypt.compare(password, user.password,(err, result) => {
+        //   if (err)  return done(err); 
+        //   if (result === true) {
+        //       return done(user, false);
+        //   } else {
+        //       return done(null, false);
+        //   }
+        // });
+        })
+  }
+));
 
   passport.serializeUser(function(user, cb) {
     process.nextTick(function() {
@@ -59,19 +64,44 @@ passport.use(new LocalStrategy(function verify(username, password, done) {
     });
   });
   
-  app.post('/login', passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login'
-  }));
+
+app.post('/test', (req,res) =>{
+  db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[req.body.username] ,
+    function(err, results) {
+      console.log(req.body.username)
+      console.log(results); // results contains rows returned by server
+    }
+  );    
+})
+
+  // Will pass req.body.username and req.body.password to the strategy, strategy will respond
+  app.post('/login', (req,res,next) =>{
+    passport.authenticate('local',(err,user,info) => {
+        if (err) throw err;
+        if (!user){
+        console.log(err)
+        console.log(info)
+        console.log(user)
+        res.send("No user exists");
+        }
+        else {
+            req.logIn(user,err => {
+                if(err) throw err
+                res.send('succesfully authenticated')
+                console.log(req.user)
+            })
+        }
+    })(req,res,next)
+});
 
 app.post('/adduser', (req,res) => {
     db.query('INSERT INTO user_credentials (username,password) VALUES (?,?)',
-    [req.body.usernameEntered,req.body.passwordEntered],
+    [req.body.username,req.body.password],
     (err,results) => {
         if(err){
             console.log(err)
         } else{
-            res.send('something')
+            res.send('User added to DB')
         }
     })
 })
