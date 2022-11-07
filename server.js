@@ -8,11 +8,22 @@ const crypto = require ('crypto');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const bcrypt = require('bcrypt');
-
 require('dotenv').config();
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: false,
+  // store: new SQLiteStore({ db: 'user_credentials.db', dir: './var/db' })
+}));
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({extended: false}))
+app.use(passport.initialize()) // init passport on every route call
+app.use(passport.session())    //allow passport to use "express-session"
+
+// app.use(express.static(path.join(__dirname, 'public')));
+
 
 const db = mysql.createConnection({
     user: 'root',
@@ -21,23 +32,16 @@ const db = mysql.createConnection({
     password: `${process.env.ROOT_PASSWORD}`
 });
 
-// app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: false,
-  // store: new SQLiteStore({ db: 'user_credentials.db', dir: './var/db' })
-}));
 
-app.use(passport.authenticate('session'));
 
 passport.use(new LocalStrategy(
   function verify(username, password, done) {
     db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[username],
         function(err, user) {
-        if (err)  return done(err); 
-        if (!user) return done(null, false); 
-        if (user) return done(user, user); 
+          return done(null,user)
+        // if (err)  return done(err); 
+        // if (!user) {return done(user, user)}; 
+        // if (user) {return done(user, user[0])}; 
 
         
         // bcrypt.compare(password, user.password,(err, result) => {
@@ -76,22 +80,28 @@ app.post('/test', (req,res) =>{
 
   // Will pass req.body.username and req.body.password to the strategy, strategy will respond
   app.post('/login', (req,res,next) =>{
-    passport.authenticate('local',(err,user,info) => {
-        if (err) throw err;
-        if (!user){
-        console.log(err)
-        console.log(info)
-        console.log(user)
-        res.send("No user exists");
-        }
-        else {
-            req.logIn(user,err => {
-                if(err) throw err
-                res.send('succesfully authenticated')
-                console.log(req.user)
-            })
-        }
-    })(req,res,next)
+    passport.authenticate('local',
+      function  (req,res) {
+        console.log(res)
+
+      }
+    // (err,user,info) => {
+    //     if (err) throw err;
+    //     if (!user){
+    //     console.log(err)
+    //     console.log(info)
+    //     console.log(user)
+    //     res.send("No user exists");
+    //     }
+    //     else {
+    //         req.logIn(user,err => {
+    //             if(err) throw err
+    //             res.send('succesfully authenticated')
+    //             console.log(req.user)
+    //         })
+    //     }
+    // }
+    )(req,res,next)
 });
 
 app.post('/adduser', (req,res) => {
