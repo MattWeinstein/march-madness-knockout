@@ -3,16 +3,39 @@ const app = express();
 const mysql = require('mysql2');
 const cors = require ('cors');
 const passport = require('passport');
-const LocalStrategy = require('passport-local');
 const crypto = require ('crypto');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const bcrypt = require('bcrypt');
-
+const flash = require('express-flash')
 require('dotenv').config();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({extended:false}))
+app.use(flash())
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  // store: new SQLiteStore({ db: 'user_credentials.db', dir: './var/db' })
+}));
+app.use(passport.initialize())
+app.use(passport.session())
+
+const initializePassport = require('./passport.config.js')
+initializePassport(passport,username => {
+  return  (db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[username]
+  ))
+})
+
+
+// app.use(express.session({ secret: 'SECRET' })); // session secret
+// app.use(passport.initialize());
+// app.use(passport.session()); // persistent login sessions
+
+
+
 
 const db = mysql.createConnection({
     user: 'root',
@@ -22,47 +45,10 @@ const db = mysql.createConnection({
 });
 
 // app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: false,
-  // store: new SQLiteStore({ db: 'user_credentials.db', dir: './var/db' })
-}));
+
 
 app.use(passport.authenticate('session'));
 
-passport.use(new LocalStrategy(
-  function verify(username, password, done) {
-    db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[username],
-        function(err, user) {
-        if (err)  return done(err); 
-        if (!user) return done(null, false); 
-        if (user) return done(user, user); 
-
-        
-        // bcrypt.compare(password, user.password,(err, result) => {
-        //   if (err)  return done(err); 
-        //   if (result === true) {
-        //       return done(user, false);
-        //   } else {
-        //       return done(null, false);
-        //   }
-        // });
-        })
-  }
-));
-
-  passport.serializeUser(function(user, cb) {
-    process.nextTick(function() {
-      cb(null, { id: user.id, username: user.username });
-    });
-  });
-  
-  passport.deserializeUser(function(user, cb) {
-    process.nextTick(function() {
-      return cb(null, user);
-    });
-  });
   
 
 app.post('/test', (req,res) =>{
