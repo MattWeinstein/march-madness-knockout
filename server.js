@@ -8,6 +8,9 @@ const crypto = require ('crypto');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const bcrypt = require('bcrypt');
+const bodyParser = require('body-parser')
+
+
 require('dotenv').config();
 app.use(session({
   secret: 'keyboard cat',
@@ -17,10 +20,12 @@ app.use(session({
 }));
 
 app.use(cors());
-app.use(express.json());
+// app.use(express.json());
 app.use(express.urlencoded({extended: false}))
 app.use(passport.initialize()) // init passport on every route call
 app.use(passport.session())    //allow passport to use "express-session"
+app.use(bodyParser.json());                        
+
 
 // app.use(express.static(path.join(__dirname, 'public')));
 
@@ -32,29 +37,47 @@ const db = mysql.createConnection({
     password: `${process.env.ROOT_PASSWORD}`
 });
 
+function generateHash(password){
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(password,salt);
+  
+  return hash
+}
 
-
-passport.use(new LocalStrategy(
-  function verify(username, password, done) {
+passport.use(new LocalStrategy (
+  function (username, password, done) {
+    console.log(username)
     db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[username],
-        function(err, user) {
-          return done(null,user)
-        // if (err)  return done(err); 
-        // if (!user) {return done(user, user)}; 
-        // if (user) {return done(user, user[0])}; 
+          function(err, user) {
+            if (err)  {
+              console.log('error')
+              return done(err)
+            }
+            if (!user[0]) {
+              console.log('no user')
+              return done(null, false)
+            }
+            if (user) {
+              console.log(password)
+              console.log(user[0].password)
+            }
 
-        
-        // bcrypt.compare(password, user.password,(err, result) => {
-        //   if (err)  return done(err); 
-        //   if (result === true) {
-        //       return done(user, false);
-        //   } else {
-        //       return done(null, false);
-        //   }
-        // });
-        })
+            bcrypt.compare(password, user[0].password,(err, result) => {
+              console.log('compparing...')
+              if (err)  return done(err); 
+              if (result == true) {
+                  console.log('Password correct')
+                  return done(null, user);
+              } else {
+                console.log(result,'Password incorrect')
+                return done(null, false);
+              }
+            })
+          }
+    )
   }
 ));
+
 
   passport.serializeUser(function(user, cb) {
     process.nextTick(function() {
@@ -73,18 +96,17 @@ app.post('/test', (req,res) =>{
   db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[req.body.username] ,
     function(err, results) {
       console.log(req.body.username)
-      console.log(results); // results contains rows returned by server
+      res.send(results.data); // results contains rows returned by server
     }
   );    
 })
 
   // Will pass req.body.username and req.body.password to the strategy, strategy will respond
-  app.post('/login', (req,res,next) =>{
+  app.post('/login', 
     passport.authenticate('local',
       function  (req,res) {
-        console.log(res)
+        console.log('response heard',res)
 
-      }
     // (err,user,info) => {
     //     if (err) throw err;
     //     if (!user){
@@ -101,12 +123,12 @@ app.post('/test', (req,res) =>{
     //         })
     //     }
     // }
-    )(req,res,next)
-});
+      }
+    ));
 
 app.post('/adduser', (req,res) => {
     db.query('INSERT INTO user_credentials (username,password) VALUES (?,?)',
-    [req.body.username,req.body.password],
+    [req.body.username,`${generateHash(req.body.password)}`],
     (err,results) => {
         if(err){
             console.log(err)
