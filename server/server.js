@@ -3,83 +3,27 @@ const app = express();
 const cors = require ('cors');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
-const crypto = require ('crypto');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const bodyParser = require('body-parser')
-const bcrypt = require('bcrypt');
-
-const password =  require('./utils/password')
 
 require('dotenv').config();
+require('./utils/authentication')(passport)
+
 app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: false,
   // store: new SQLiteStore({ db: 'user_credentials.db', dir: './var/db' })
 }));
-
 app.use(cors());
-// app.use(express.json());
-// passport.use('MyLocalStrategy',authentication.localStrategy)
-
 app.use(express.urlencoded({extended: false}))
 app.use(passport.initialize()) // init passport on every route call
 app.use(passport.session())    //allow passport to use "express-session"
 app.use(bodyParser.json());    
-require('./utils/authentication')(passport)
-const db = require ('./utils/databaseConfig')
-console.log(db.db)
 
-
-// app.use(express.static(path.join(__dirname, 'public')));
-
-passport.use(new LocalStrategy (
-  function (username, password, done) {
-    console.log(username)
-    db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[username],
-          function(err, user) {
-            console.log('hel2lo')
-
-            if (err)  {
-              console.log('error')
-              return done(err)
-            }
-            if (!user[0]) {
-              console.log('no user')
-              return done(null, false)
-            }
-            if (user) {
-              console.log(password)
-              console.log(user[0].password)
-            }
-          
-          bcrypt.compare(password, user[0].password,(err, result) => {
-            if (err)  return done(err); 
-            if (result == true) {
-                console.log('Password correct')
-                return done(null, user);
-            } else {
-              console.log(result,'Password incorrect')
-              return done(null, false);
-            }
-          })})        
-  }
-));
-
-
-  passport.serializeUser(function(user, cb) {
-    process.nextTick(function() {
-      cb(null, { id: user.id, username: user.username });
-    });
-  });
-  
-  passport.deserializeUser(function(user, cb) {
-    process.nextTick(function() {
-      return cb(null, user);
-    });
-  });
-  
+const db = require ('./utils/databaseConfig');
+const password =  require('./utils/password')
 
 app.post('/test', (req,res) =>{
   db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[req.body.username] ,
