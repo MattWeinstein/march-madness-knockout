@@ -1,15 +1,15 @@
 const express = require('express');
 const app = express();
-const mysql = require('mysql2');
 const cors = require ('cors');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const crypto = require ('crypto');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
-const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser')
+const bcrypt = require('bcrypt');
 
+const password =  require('./utils/password')
 
 require('dotenv').config();
 app.use(session({
@@ -21,34 +21,26 @@ app.use(session({
 
 app.use(cors());
 // app.use(express.json());
+// passport.use('MyLocalStrategy',authentication.localStrategy)
+
 app.use(express.urlencoded({extended: false}))
 app.use(passport.initialize()) // init passport on every route call
 app.use(passport.session())    //allow passport to use "express-session"
-app.use(bodyParser.json());                        
+app.use(bodyParser.json());    
+require('./utils/authentication')(passport)
+const db = require ('./utils/databaseConfig')
+console.log(db.db)
 
 
 // app.use(express.static(path.join(__dirname, 'public')));
-
-
-const db = mysql.createConnection({
-    user: 'root',
-    host: 'localhost',
-    database: 'mmko_data',
-    password: `${process.env.ROOT_PASSWORD}`
-});
-
-function generateHash(password){
-  const salt = bcrypt.genSaltSync(10);
-  const hash = bcrypt.hashSync(password,salt);
-  
-  return hash
-}
 
 passport.use(new LocalStrategy (
   function (username, password, done) {
     console.log(username)
     db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[username],
           function(err, user) {
+            console.log('hel2lo')
+
             if (err)  {
               console.log('error')
               return done(err)
@@ -61,20 +53,17 @@ passport.use(new LocalStrategy (
               console.log(password)
               console.log(user[0].password)
             }
-
-            bcrypt.compare(password, user[0].password,(err, result) => {
-              console.log('compparing...')
-              if (err)  return done(err); 
-              if (result == true) {
-                  console.log('Password correct')
-                  return done(null, user);
-              } else {
-                console.log(result,'Password incorrect')
-                return done(null, false);
-              }
-            })
-          }
-    )
+          
+          bcrypt.compare(password, user[0].password,(err, result) => {
+            if (err)  return done(err); 
+            if (result == true) {
+                console.log('Password correct')
+                return done(null, user);
+            } else {
+              console.log(result,'Password incorrect')
+              return done(null, false);
+            }
+          })})        
   }
 ));
 
@@ -103,10 +92,9 @@ app.post('/test', (req,res) =>{
 
   // Will pass req.body.username and req.body.password to the strategy, strategy will respond
   app.post('/login', 
-    passport.authenticate('local',
-      function  (req,res) {
-        console.log('response heard',res)
-
+    passport.authenticate('local', (err,user,info) => {
+        console.log('response heard',user)
+      }))
     // (err,user,info) => {
     //     if (err) throw err;
     //     if (!user){
@@ -123,12 +111,12 @@ app.post('/test', (req,res) =>{
     //         })
     //     }
     // }
-      }
-    ));
+    //   }
+    // ));
 
 app.post('/adduser', (req,res) => {
     db.query('INSERT INTO user_credentials (username,password) VALUES (?,?)',
-    [req.body.username,`${generateHash(req.body.password)}`],
+    [req.body.username,`${password.generateHash(req.body.password)}`],
     (err,results) => {
         if(err){
             console.log(err)
