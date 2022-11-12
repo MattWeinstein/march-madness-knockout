@@ -1,16 +1,12 @@
-const LocalStrategy = require('passport-local');
-const db = require ('./databaseConfig.js')
-const bcrypt = require('bcrypt');
+import LocalStrategy from 'passport-local';
+import db from './databaseConfig.js';
+import bcrypt from 'bcrypt';
 
-
-module.exports = function(passport){
+const localStrategyHandler = function(passport){
 passport.use(new LocalStrategy (
     function (username, password, done) {
-      console.log(username)
       db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[username],
             function(err, user) {
-                console.log('hel2lo')
-
               if (err)  {
                 console.log('error')
                 return done(err)
@@ -19,16 +15,12 @@ passport.use(new LocalStrategy (
                 console.log('no user')
                 return done(null, false)
               }
-              if (user) {
-                console.log(password)
-                console.log(user[0].password)
-              }
             
             bcrypt.compare(password, user[0].password,(err, result) => {
               if (err)  return done(err); 
               if (result == true) {
                   console.log('Password correct')
-                  return done(null, user);
+                  return done(null, user,{message: 'Incorrect Password'});
               } else {
                 console.log(result,'Password incorrect')
                 return done(null, false);
@@ -49,3 +41,5 @@ passport.use(new LocalStrategy (
     });
   });
 }
+
+export default localStrategyHandler;

@@ -1,7 +1,9 @@
 import styled from 'styled-components'
 import Axios from 'axios';
 import './Login.css'
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
+import { Route, Navigate, useNavigate } from "react-router-dom";
+
 
 const Label = styled.label`
     color: blue
@@ -27,11 +29,19 @@ const LoginInputContainer = styled.div``
 function Login () {
     const [username,setUsername] = useState('')
     const [password,setPassword] = useState('')
+    const [user,setUser] = useState(null)
+
+    const navigate = useNavigate()
+
+    useEffect(()=>{
+        if (user){
+        navigate("/user")
+        }
+    })
 
     const usernameHandler = (event) => {
         setUsername(event.target.value)
     }
-    console.log(username)
 
     const passwordHandler = (event) => {
         setPassword(event.target.value)
@@ -46,13 +56,21 @@ function Login () {
         })    
     }
 
-    const loginHandler = () => {
+    const loginHandler = (req,res) => {
         Axios.post('http://localhost:3001/login',{
             username: username,
             password: password
         })
         .then((response) => {
-            console.log(response)
+            const selectedUser = response.data[0]
+            if(selectedUser){
+                setUser(selectedUser)
+                console.log('hooo')
+
+            } else if(!selectedUser){
+                setUser(false)
+            }
+            console.log(user)
         })    
     }
 
