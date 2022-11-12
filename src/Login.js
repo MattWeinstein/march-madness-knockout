@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import Axios from 'axios';
-import './Login.css'
 import { useState,useEffect,useSearchParams } from 'react';
 import { Route, Navigate, useNavigate } from "react-router-dom";
 
@@ -35,7 +34,7 @@ function Login () {
 
     useEffect(()=>{
         if (user){
-        navigate("/user")
+        navigate(`/user/${user}`)
         }
     })
 
@@ -62,15 +61,13 @@ function Login () {
             password: password
         })
         .then((response) => {
-            const selectedUser = response.data[0]
+            const selectedUser = response.data[0].username
+
             if(selectedUser){
                 setUser(selectedUser)
-                console.log('hooo')
-
             } else if(!selectedUser){
                 setUser(false)
             }
-            console.log(user)
         })    
     }
 

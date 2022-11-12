@@ -41,12 +41,12 @@ app.post('/test', (req,res) =>{
     passport.authenticate('local', function (err,user,info) {
         if (err) throw err;
         if (!user){
-          res.send(user);
+          res.send('nooo, user not found')
         }
         else {
         req.logIn(user,err => {
           if(err) throw err
-          res.send('Yes, user')
+          res.send(user)
         })
         
       }})(req,res,next)
