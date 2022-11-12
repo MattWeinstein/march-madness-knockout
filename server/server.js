@@ -7,8 +7,6 @@ import session from 'express-session';
 import bodyParser from 'body-parser';
 import { redirect } from "react-router-dom";
 
-
-
 import {} from 'dotenv/config'
 import localStrategyHandler from './utils/authentication.js'
 localStrategyHandler(passport)

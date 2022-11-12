@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import Axios from 'axios';
 import './Login.css'
-import { useState,useEffect } from 'react';
+import { useState,useEffect,useSearchParams } from 'react';
 import { Route, Navigate, useNavigate } from "react-router-dom";
 
 
