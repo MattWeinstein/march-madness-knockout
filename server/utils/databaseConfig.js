@@ -1,4 +1,4 @@
-const mysql = require('mysql2');
+import mysql from 'mysql2';
 
 const db = mysql.createConnection({
     user: 'root',
@@ -7,4 +7,4 @@ const db = mysql.createConnection({
     password: `${process.env.ROOT_PASSWORD}`
 });
 
-module.exports = db;
+export default db;

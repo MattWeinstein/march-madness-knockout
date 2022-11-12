@@ -1,11 +1,10 @@
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
 
-function generateHash (password) {
+const generateHash = function (password) {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password,salt);
     
     return hash
 }
 
-
-module.exports = { generateHash }
+export default generateHash;
