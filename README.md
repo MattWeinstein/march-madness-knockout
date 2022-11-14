@@ -25,3 +25,15 @@ A page for every user to view all other users picks will be made available after
 - Node.js | Development environment
 - SQL | Database
 - GitGuardian | Secrets security
+
+# Get Started
+
+## Procedure to run this app locally
+1. `Git` must be installed on your local machine
+2. Run `git clone` to get a local copy of this repo
+3. Run `npm ci` to download node modules
+
+The client and server must be started in separate terminals.
+4. Run `npm start` to start the application on localhost:3000
+5. Open a different terminal and run `npm run server` to start the server on localhost:3001
+6. Pat yourself on the back
