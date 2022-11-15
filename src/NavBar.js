@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components'
 import {Link} from 'react-router-dom';
 
@@ -21,5 +22,6 @@ return(
     </GlobalNav>
 )
 }
+
 
 export default NavBar;

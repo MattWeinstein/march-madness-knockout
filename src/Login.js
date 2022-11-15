@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import Axios from 'axios';
-import { useState,useEffect,useSearchParams } from 'react';
+import React, { useState,useEffect,useSearchParams } from 'react';
+import passport from 'passport';
 import { Route, Navigate, useNavigate } from "react-router-dom";
 
 
@@ -62,7 +63,6 @@ function Login () {
         })
         .then((response) => {
             const selectedUser = response.data[0].username
-
             if(selectedUser){
                 setUser(selectedUser)
             } else if(!selectedUser){
