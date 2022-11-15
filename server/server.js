@@ -14,13 +14,13 @@ import generateHash from './utils/password.js';
 localStrategyHandler(passport)
 const SQLSessionStore = (mySQLStore)(session)
 
-// const mySQLStoreOptions = {
-//   host: 'localhost',
-//   port: 3306,
-//   user: 'root',
-//   password: `${process.env.ROOT_PASSWORD}`,
-//   database: 'mmko_data'
-// }
+const mySQLStoreOptions = {
+  host: 'localhost',
+  port: 3306,
+  user: 'root',
+  password: `${process.env.ROOT_PASSWORD}`,
+  database: 'mmko_data'
+}
 // const sessionStore = new SQLSessionStore({},db)
 
 app.use(session({
@@ -32,7 +32,7 @@ app.use(session({
     maxAge: 24*60*60*1000,
   }
     ,
-  // store: sessionStore
+  store: new SQLSessionStore(mySQLStoreOptions)
 }));
 
 app.use(cors());
