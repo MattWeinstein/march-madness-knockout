@@ -21,6 +21,7 @@ A page for every user to view all other users picks will be made available after
 ## Project Management
 This project completes work broken down int sprints to promote agile product development. Sprints occer every week and begin on Monday.
 
+Tech used:
 - React.js | Frontend library
 - Styled Components | Styling
 - Node.js | Development environment
