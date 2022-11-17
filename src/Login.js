@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import Axios from 'axios';
-import './Login.css'
-import { useState,useEffect } from 'react';
+import React, { useState,useEffect,useSearchParams } from 'react';
+import passport from 'passport';
 import { Route, Navigate, useNavigate } from "react-router-dom";
 
 
@@ -25,6 +25,21 @@ const LoginInput = styled.input`
 `
 const LoginInputContainer = styled.div``
 
+const Button = styled.button`
+    all:unset;
+    margin:10px;
+    cursor:pointer;
+    padding: 2px 15px;
+    border: 2px solid black;
+    border-radius: 5px;
+    &:hover{
+        background:silver;
+    }
+    &:focus{
+        background:gray;
+    }
+`
+
 
 function Login () {
     const [username,setUsername] = useState('')
@@ -35,7 +50,7 @@ function Login () {
 
     useEffect(()=>{
         if (user){
-        navigate("/user")
+        navigate(`/user/${user}`)
         }
     })
 
@@ -62,15 +77,12 @@ function Login () {
             password: password
         })
         .then((response) => {
-            const selectedUser = response.data[0]
+            const selectedUser = response.data[0].username
             if(selectedUser){
                 setUser(selectedUser)
-                console.log('hooo')
-
             } else if(!selectedUser){
                 setUser(false)
             }
-            console.log(user)
         })    
     }
 
@@ -94,9 +106,9 @@ function Login () {
                     <Label >Password</Label>
                     <LoginInput type="text" name ="password" placeholder="Password" onChange={passwordHandler}></LoginInput>
                 </LoginInputContainer>
-                <button onClick={loginHandler} id='loginButton'>Check Login</button>
-                <button onClick={addUserHandler} >Add User</button>
-                <button onClick={getUserHandler} >Get User</button>
+                <Button onClick={loginHandler} id='loginButton'>Check Login</Button>
+                <Button onClick={addUserHandler} >Add User</Button>
+                <Button onClick={getUserHandler} >Get User</Button>
             </LoginContainer>
         </section>
     )
