@@ -19,17 +19,20 @@ Games for each day, as well as game results will be automated through an API to 
 A page for every user to view all other users picks will be made available after tip-off each day.
 
 ## Project Management
+This project completes work broken down int sprints to promote agile product development. Sprints occer every week and begin on Monday.
 
 - React.js | Frontend library
 - Styled Components | Styling
 - Node.js | Development environment
+- Passport.js | User authentication + User session
 - SQL | Database
 - GitGuardian | Secrets security
+- RenovateBot | Dependency Update
 
 # Get Started
 
 ## Procedure to run this app locally
-1. `Git` must be installed on your local machine
+1. `git` must be installed on your local machine
 2. Run `git clone` to get a local copy of this repo
 3. Run `npm ci` to download node modules
 
