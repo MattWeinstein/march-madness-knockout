@@ -25,6 +25,21 @@ const LoginInput = styled.input`
 `
 const LoginInputContainer = styled.div``
 
+const Button = styled.button`
+    all:unset;
+    margin:10px;
+    cursor:pointer;
+    padding: 2px 15px;
+    border: 2px solid black;
+    border-radius: 5px;
+    &:hover{
+        background:silver;
+    }
+    &:focus{
+        background:gray;
+    }
+`
+
 
 function Login () {
     const [username,setUsername] = useState('')
@@ -91,9 +106,9 @@ function Login () {
                     <Label >Password</Label>
                     <LoginInput type="text" name ="password" placeholder="Password" onChange={passwordHandler}></LoginInput>
                 </LoginInputContainer>
-                <button onClick={loginHandler} id='loginButton'>Check Login</button>
-                <button onClick={addUserHandler} >Add User</button>
-                <button onClick={getUserHandler} >Get User</button>
+                <Button onClick={loginHandler} id='loginButton'>Check Login</Button>
+                <Button onClick={addUserHandler} >Add User</Button>
+                <Button onClick={getUserHandler} >Get User</Button>
             </LoginContainer>
         </section>
     )
