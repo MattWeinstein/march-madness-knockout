@@ -35,7 +35,7 @@ const Button = styled.button`
     &:hover{
         background:silver;
     }
-    &:focus{
+    &:active{
         background:gray;
     }
 `
@@ -78,6 +78,7 @@ function Login () {
         })
         .then((response) => {
             const selectedUser = response.data[0].username
+            console.log('yippee',req.user)
             if(selectedUser){
                 setUser(selectedUser)
             } else if(!selectedUser){

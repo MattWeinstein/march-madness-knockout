@@ -12,15 +12,15 @@ import localStrategyHandler from './utils/authentication.js'
 import db from './utils/databaseConfig.js';
 import generateHash from './utils/password.js';
 localStrategyHandler(passport)
-const SQLSessionStore = (mySQLStore)(session)
+// const SQLSessionStore = (mySQLStore)(session)
 
-const mySQLStoreOptions = {
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  password: `${process.env.ROOT_PASSWORD}`,
-  database: 'mmko_data'
-}
+// const mySQLStoreOptions = {
+//   host: 'localhost',
+//   port: 3306,
+//   user: 'root',
+//   password: `${process.env.ROOT_PASSWORD}`,
+//   database: 'mmko_data'
+// }
 // const sessionStore = new SQLSessionStore({},db)
 
 app.use(session({
@@ -30,9 +30,8 @@ app.use(session({
   cookie: {
     test: 'test',
     maxAge: 24*60*60*1000,
-  }
-    ,
-  store: new SQLSessionStore(mySQLStoreOptions)
+  },
+  // store: session
 }));
 
 app.use(cors());
@@ -60,9 +59,13 @@ app.post('/test', (req,res) =>{
         else {
         req.logIn(user,err => {
           if(err) throw err
+          req.session.user = user;
           res.send(user)
         })
         console.log('try1',req.session)
+        console.log('try2',req.passport)
+        console.log('try3',user)
+        console.log('try4',req.user)
         
       }})(req,res,next)
     });
