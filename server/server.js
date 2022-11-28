@@ -7,7 +7,7 @@ import mySQLStore from 'express-mysql-session';
 import bodyParser from 'body-parser';
 import { redirect } from "react-router-dom";
 
-import {} from 'dotenv/config'
+import { } from 'dotenv/config'
 import localStrategyHandler from './utils/authentication.js'
 import db from './utils/databaseConfig.js';
 import generateHash from './utils/password.js';
@@ -29,64 +29,62 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     test: 'test',
-    maxAge: 24*60*60*1000,
+    maxAge: 24 * 60 * 60 * 1000,
   },
   // store: session
 }));
 
 app.use(cors());
-app.use(express.urlencoded({extended: false}))
+app.use(express.urlencoded({ extended: false }))
 app.use(passport.initialize()) // init passport on every route call
 app.use(passport.session())    //allow passport to use "express-session"
-app.use(bodyParser.json());    
+app.use(bodyParser.json());
 
-app.post('/allusers', (req,res) =>{
+app.post('/allusers', (req, res) => {
   db.query('SELECT * FROM `user_credentials`',
-    function(err, results) {
-      console.log('server',results)
+    function (err, results) {
+      console.log('server', results)
       res.send(results); // results contains rows returned by server
     }
-  );    
+  );
 })
 
-  // Will pass req.body.username and req.body.password to the strategy, strategy will respond
-  app.post('/login', function (req,res,next) {
-    passport.authenticate('local', function (err,user,info) {
-        if (err) throw err;
-        if (!user){
-          res.send('nooo, user not found')
-        }
-        else {
-        req.logIn(user,err => {
-          if(err) throw err
-          req.session.user = user;
-          res.send(user)
-        })
-        console.log('try1',req.session)
-        console.log('try2',req.passport)
-        console.log('try3',user)
-        console.log('try4',req.user)
-        
-      }})(req,res,next)
-    });
-
-app.post('/adduser', (req,res) => {
-    db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[req.body.username] ,
-      function(err, results) {
-        if (results.length === 1) {
-          res.send('UThere is already a user with that username')
-        } else if(results.length === 0) {
-          db.query('INSERT INTO user_credentials (username,password) VALUES (?,?)',
-          [req.body.username,`${generateHash(req.body.password)}`],
-          (err,results) => {
-              if(err){
-                  console.log(err)
-              } else{
-                console.log('User added to DB')
-              }
-          })}})
+// Will pass req.body.username and req.body.password to the strategy, strategy will respond
+app.post('/login', function (req, res, next) {
+  passport.authenticate('local', function (err, user, info) {
+    if (err) throw err;
+    if (!user) {
+      info.message ? res.send(info.message) : res.send('Please try again')
+    }
+    else {
+      req.logIn(user, err => {
+        if (err) throw err
+        req.session.user = user;
+        res.send(user)
+      })
+    }
+  })(req, res, next)
 });
 
-app.listen(3001,()=>{
-    console.log('AYOO server running')
+app.post('/adduser', (req, res) => {
+  db.query('SELECT * FROM `user_credentials` WHERE `username` = ?', [req.body.username],
+    function (err, results) {
+      if (results.length === 1) {
+        res.send('There is already a user with that username')
+      } else if (results.length === 0) {
+        db.query('INSERT INTO user_credentials (username,password) VALUES (?,?)',
+          [req.body.username, `${generateHash(req.body.password)}`],
+          (err, results) => {
+            if (err) {
+              console.log(err)
+            } else {
+              console.log('User added to DB')
+            }
+          })
+      }
+    })
+});
+
+app.listen(3001, () => {
+  console.log('AYOO server running')
 });
