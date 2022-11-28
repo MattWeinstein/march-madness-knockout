@@ -1,8 +1,7 @@
 import styled from 'styled-components'
 import Axios from 'axios';
-import React, { useState,useEffect,useSearchParams } from 'react';
-import passport from 'passport';
-import { Route, Navigate, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 
 
 const Label = styled.label`
@@ -41,16 +40,16 @@ const Button = styled.button`
 `
 
 
-function Login () {
-    const [username,setUsername] = useState('')
-    const [password,setPassword] = useState('')
-    const [user,setUser] = useState(null)
+function Login() {
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const [user, setUser] = useState(null)
 
     const navigate = useNavigate()
 
-    useEffect(()=>{
-        if (user){
-        navigate(`/user/${user}`)
+    useEffect(() => {
+        if (user) {
+            navigate(`/user/${user}`)
         }
     })
 
@@ -63,49 +62,47 @@ function Login () {
     }
 
     const getUserHandler = () => {
-        Axios.post('http://localhost:3001/test',{
-            username: username
-        })
-        .then((response) => {
-            console.log(response)
-        })    
+        Axios.post('http://localhost:3001/allusers')
+            .then((response) => {
+                console.log(response)
+            })
     }
 
-    const loginHandler = (req,res) => {
-        Axios.post('http://localhost:3001/login',{
+    const loginHandler = (req, res) => {
+        Axios.post('http://localhost:3001/login', {
             username: username,
             password: password
         })
-        .then((response) => {
-            const selectedUser = response.data[0].username
-            console.log('yippee',req.user)
-            if(selectedUser){
-                setUser(selectedUser)
-            } else if(!selectedUser){
-                setUser(false)
-            }
-        })    
+            .then((response) => {
+                const selectedUser = response.data[0].username
+                console.log('yippee', req.user)
+                if (selectedUser) {
+                    setUser(selectedUser)
+                } else if (!selectedUser) {
+                    setUser(false)
+                }
+            })
     }
 
     const addUserHandler = () => {
-    Axios.post('http://localhost:3001/adduser',{
-        username: username,
-        password: password
-    })
-        .then((response) => {
-            console.log(response)
+        Axios.post('http://localhost:3001/adduser', {
+            username: username,
+            password: password
         })
+            .then((response) => {
+                console.log(response)
+            })
     }
-    return(
+    return (
         <section>
             <LoginContainer>
                 <LoginInputContainer>
                     <Label >Username</Label>
-                    <LoginInput type="text"  name ="username" placeholder="Username" onChange={usernameHandler}></LoginInput>
+                    <LoginInput type="text" name="username" placeholder="Username" onChange={usernameHandler}></LoginInput>
                 </LoginInputContainer>
                 <LoginInputContainer>
                     <Label >Password</Label>
-                    <LoginInput type="text" name ="password" placeholder="Password" onChange={passwordHandler}></LoginInput>
+                    <LoginInput type="text" name="password" placeholder="Password" onChange={passwordHandler}></LoginInput>
                 </LoginInputContainer>
                 <Button onClick={loginHandler} id='loginButton'>Check Login</Button>
                 <Button onClick={addUserHandler} >Add User</Button>

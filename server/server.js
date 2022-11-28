@@ -40,11 +40,11 @@ app.use(passport.initialize()) // init passport on every route call
 app.use(passport.session())    //allow passport to use "express-session"
 app.use(bodyParser.json());    
 
-app.post('/test', (req,res) =>{
-  db.query('SELECT * FROM `user_credentials` WHERE `username` = ?',[req.body.username] ,
+app.post('/allusers', (req,res) =>{
+  db.query('SELECT * FROM `user_credentials`',
     function(err, results) {
-      console.log(req.body.username)
-      res.send(results.data); // results contains rows returned by server
+      console.log('server',results)
+      res.send(results); // results contains rows returned by server
     }
   );    
 })
