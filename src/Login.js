@@ -44,6 +44,7 @@ function Login() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
+    const [errorMessage, setErrorMessage] = useState('')
 
     const navigate = useNavigate()
 
@@ -75,10 +76,10 @@ function Login() {
         })
             .then((response) => {
                 const selectedUser = response.data[0].username
-                console.log('yippee', req.user)
                 if (selectedUser) {
                     setUser(selectedUser)
                 } else if (!selectedUser) {
+                    setErrorMessage(response.data)
                     setUser(false)
                 }
             })
@@ -90,7 +91,7 @@ function Login() {
             password: password
         })
             .then((response) => {
-                console.log(response)
+                setErrorMessage(response.data)
             })
     }
     return (
@@ -107,6 +108,7 @@ function Login() {
                 <Button onClick={loginHandler} id='loginButton'>Check Login</Button>
                 <Button onClick={addUserHandler} >Add User</Button>
                 <Button onClick={getUserHandler} >Get User</Button>
+                <div>{errorMessage}</div>
             </LoginContainer>
         </section>
     )
