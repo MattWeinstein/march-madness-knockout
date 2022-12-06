@@ -78,7 +78,7 @@ app.post('/adduser', (req, res) => {
             if (err) {
               console.log(err)
             } else {
-              console.log('User added to DB')
+              res.send('User added to Database')
             }
           })
       }
