@@ -5,11 +5,10 @@ import passport from 'passport';
 import session from 'express-session';
 import mySQLStore from 'express-mysql-session';
 import bodyParser from 'body-parser';
-import { redirect } from "react-router-dom";
 
 import { } from 'dotenv/config'
 import localStrategyHandler from './utils/authentication.js'
-import db from './utils/databaseConfig.js';
+import { user_db } from './utils/databaseConfig.js';
 import generateHash from './utils/password.js';
 localStrategyHandler(passport)
 // const SQLSessionStore = (mySQLStore)(session)
@@ -21,7 +20,7 @@ localStrategyHandler(passport)
 //   password: `${process.env.ROOT_PASSWORD}`,
 //   database: 'mmko_data'
 // }
-// const sessionStore = new SQLSessionStore({},db)
+// const sessionStore = new SQLSessionStore({},user_db)
 
 app.use(session({
   secret: 'keyboard cat',
@@ -41,7 +40,7 @@ app.use(passport.session())    //allow passport to use "express-session"
 app.use(bodyParser.json());
 
 app.post('/allusers', (req, res) => {
-  db.query('SELECT * FROM `user_credentials`',
+  user_db.query('SELECT * FROM `user_credentials`',
     function (err, results) {
       console.log('server', results)
       res.send(results); // results contains rows returned by server
@@ -67,12 +66,12 @@ app.post('/login', function (req, res, next) {
 });
 
 app.post('/adduser', (req, res) => {
-  db.query('SELECT * FROM `user_credentials` WHERE `username` = ?', [req.body.username],
+  user_db.query('SELECT * FROM `user_credentials` WHERE `username` = ?', [req.body.username],
     function (err, results) {
       if (results.length === 1) {
         res.send('There is already a user with that username')
       } else if (results.length === 0) {
-        db.query('INSERT INTO user_credentials (username,password) VALUES (?,?)',
+        user_db.query('INSERT INTO user_credentials (username,password) VALUES (?,?)',
           [req.body.username, `${generateHash(req.body.password)}`],
           (err, results) => {
             if (err) {
@@ -84,6 +83,14 @@ app.post('/adduser', (req, res) => {
       }
     })
 });
+
+app.post('/livegames', (req, res) => {
+  user_db.query('SELECT * FROM `live_games`',
+    function (err, results) {
+      res.send(results)
+    })
+});
+
 
 app.listen(3001, () => {
   console.log('AYOO server running')

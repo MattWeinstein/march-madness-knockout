@@ -1,5 +1,6 @@
-import React from 'react';
-import { useParams } from "react-router"
+import Axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components'
 
 const PageContainer = styled.div`
@@ -26,6 +27,7 @@ const GameList = styled.ul`
 
 const Game = styled.li`
     all:unset;
+
     display:flex;
     padding:0px 0px;
     justify-content: center;
@@ -33,22 +35,41 @@ const Game = styled.li`
     margin: auto;
 `
 
-function UserHomepage ()  {
-    const { username } = useParams('')
-    return(
+
+
+function UserHomepage() {
+    const location = useLocation()
+    const [user, setUser] = useState('')
+    const [games, setGames] = useState([])
+    const getLiveGames = () => {
+        Axios.post('http://localhost:3001/livegames')
+            .then((response) => {
+                setGames(response.data)
+            })
+    }
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (user) {
+            navigate(`/user/${user}`)
+        }
+        getLiveGames()
+
+    }, [])
+
+    return (
         <PageContainer>
             <Section>
-                <h1>Welcome {username}</h1>
+                <h1>Welcome {user} </h1>
                 <p>This is your homepage. You can't customize it right now, but maybe you can in the future.</p>
             </Section>
             <Section>
                 <h2>This is where you make your picks</h2>
                 <h3>Games today</h3>
                 <GameList>
-                    <Game>Syracuse vs Illinois</Game>
-                    <Game>Ohio St vs Kentucky</Game>
-                    <Game>Villanova vs Eastern Mississippi</Game>
-                    <Game>Boston College vs Albany</Game>
+                    {games.map((ele, index) =>
+                        <Game key={index}>{ele.team1} vs. {ele.team2}</Game>
+                    )}
                 </GameList>
             </Section>
         </PageContainer>
