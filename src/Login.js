@@ -50,7 +50,7 @@ function Login() {
 
     useEffect(() => {
         if (user) {
-            navigate(`/user/${user}`)
+            navigate(`/user/${user}`, { state: { user: user } })
         }
     })
 
@@ -62,6 +62,14 @@ function Login() {
         setPassword(event.target.value)
     }
 
+    const loginHandler = (user) => {
+        setUser(user)
+    }
+
+    const logoutHandler = () => {
+        setUser(null)
+    }
+
     const getUserHandler = () => {
         Axios.post('http://localhost:3001/allusers')
             .then((response) => {
@@ -69,7 +77,7 @@ function Login() {
             })
     }
 
-    const loginHandler = (req, res) => {
+    const checkLoginHandler = (req, res) => {
         Axios.post('http://localhost:3001/login', {
             username: username,
             password: password
@@ -77,7 +85,7 @@ function Login() {
             .then((response) => {
                 const selectedUser = response.data[0].username
                 if (selectedUser) {
-                    setUser(selectedUser)
+                    loginHandler(selectedUser)
                 } else if (!selectedUser) {
                     setErrorMessage(response.data)
                     setUser(false)
@@ -105,7 +113,7 @@ function Login() {
                     <Label >Password</Label>
                     <LoginInput type="text" name="password" placeholder="Password" onChange={passwordHandler}></LoginInput>
                 </LoginInputContainer>
-                <Button onClick={loginHandler} id='loginButton'>Check Login</Button>
+                <Button onClick={checkLoginHandler} id='loginButton'>Check Login</Button>
                 <Button onClick={addUserHandler} >Add User</Button>
                 <Button onClick={getUserHandler} >Get User</Button>
                 <div>{errorMessage}</div>

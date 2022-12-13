@@ -1,11 +1,11 @@
 import LocalStrategy from 'passport-local';
-import db from './databaseConfig.js';
+import { user_db } from './databaseConfig.js';
 import bcrypt from 'bcrypt';
 
 const localStrategyHandler = function (passport) {
   passport.use(new LocalStrategy(
     function (username, password, done) {
-      db.query('SELECT * FROM `user_credentials` WHERE `username` = ?', [username],
+      user_db.query('SELECT * FROM `user_credentials` WHERE `username` = ?', [username],
         function (err, user) {
           if (err) {
             console.log('error')
