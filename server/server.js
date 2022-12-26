@@ -6,12 +6,13 @@ import session from 'express-session';
 import mySQLStore from 'express-mysql-session';
 import bodyParser from 'body-parser';
 import { redirect } from "react-router-dom";
-
-import { } from 'dotenv/config'
+import jsonwebtoken from 'jsonwebtoken';
+import dotenv from 'dotenv/config'
 import localStrategyHandler from './utils/authentication.js'
 import db from './utils/databaseConfig.js';
 import generateHash from './utils/password.js';
 localStrategyHandler(passport)
+
 // const SQLSessionStore = (mySQLStore)(session)
 
 // const mySQLStoreOptions = {
@@ -59,8 +60,9 @@ app.post('/login', function (req, res, next) {
     else {
       req.logIn(user, err => {
         if (err) throw err
+        const jwt = jsonwebtoken.sign({ user_id: user.user_id, username: user.username }, process.env.JWT_TOKEN_SECRET)
         req.session.user = user;
-        res.send(user)
+        res.send({ user: user, accessToken: jwt })
       })
     }
   })(req, res, next)

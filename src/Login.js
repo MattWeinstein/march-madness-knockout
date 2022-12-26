@@ -75,7 +75,8 @@ function Login() {
             password: password
         })
             .then((response) => {
-                const selectedUser = response.data[0].username
+                console.log(response)
+                const selectedUser = response.data.user[0].username
                 if (selectedUser) {
                     setUser(selectedUser)
                 } else if (!selectedUser) {
