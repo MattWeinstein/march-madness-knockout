@@ -5,7 +5,6 @@ import PicksTable from './PicksTable';
 const PicksBoard = () => {
 
     const [allUsers, setAllUsers] = useState('')
-
     useEffect(() => {
         getAllUsers()
         async function getAllUsers() {

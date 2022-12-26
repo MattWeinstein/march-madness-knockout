@@ -41,14 +41,34 @@ app.use(passport.initialize()) // init passport on every route call
 app.use(passport.session())    //allow passport to use "express-session"
 app.use(bodyParser.json());
 
-app.post('/allusers', (req, res) => {
-  db.query('SELECT * FROM `user_credentials`',
-    function (err, results) {
-      console.log('server', results)
-      res.send(results); // results contains rows returned by server
-    }
-  );
+
+app.post('/allusers', verifyToken, (req, res) => {
+  // db.query('SELECT * FROM `user_credentials`',
+  //   function (err, results) {
+  //     res.send(results); // results contains rows returned by server
+  //   }
+  // );
+
+  jsonwebtoken.verify(req.token, process.env.JWT_TOKEN_SECRET, (err, user) => {
+    console.log(req.token, user)
+    if (err) return console.log('you do not have access, token incorrect')
+    res.json = ({ user })
+  })
+
+
 })
+
+function verifyToken(req, res, next) {
+  const authHeader = req.headers['authorization']
+  const userToken = authHeader && authHeader.split(' ')[1]
+
+  if (userToken == null) return console.log('no user TOken')
+
+  if (userToken && typeof userToken === 'string') {
+    req.token = userToken
+  }
+  next()
+}
 
 // Will pass req.body.username and req.body.password to the strategy, strategy will respond
 app.post('/login', function (req, res, next) {
@@ -60,10 +80,11 @@ app.post('/login', function (req, res, next) {
     else {
       req.logIn(user, err => {
         if (err) throw err
-        const jwt = jsonwebtoken.sign({ user_id: user.user_id, username: user.username }, process.env.JWT_TOKEN_SECRET)
         req.session.user = user;
-        res.send({ user: user, accessToken: jwt })
       })
+      const jwtAccessToken = jsonwebtoken.sign({ user_id: user.user_id, username: user.username }, process.env.JWT_TOKEN_SECRET)
+      res.json({ user: user, accessToken: jwtAccessToken })
+
     }
   })(req, res, next)
 });

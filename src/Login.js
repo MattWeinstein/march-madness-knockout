@@ -43,13 +43,21 @@ const Button = styled.button`
 function Login() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [accessToken, setAccessToken] = useState('')
     const [user, setUser] = useState(null)
     const [errorMessage, setErrorMessage] = useState('')
 
     const navigate = useNavigate()
 
+    Axios.defaults.headers.common['authorization'] = `Bearer ${accessToken}`
+
+
     useEffect(() => {
         if (user) {
+            // Run verify token function to make sure token is in proper form
+
+            // Verify token methon from package
+            // If true -> 
             navigate(`/user/${user}`)
         }
     })
@@ -77,8 +85,10 @@ function Login() {
             .then((response) => {
                 console.log(response)
                 const selectedUser = response.data.user[0].username
+                const accessToken = response.data.accessToken
                 if (selectedUser) {
                     setUser(selectedUser)
+                    setAccessToken(accessToken)
                 } else if (!selectedUser) {
                     setErrorMessage(response.data)
                     setUser(false)
