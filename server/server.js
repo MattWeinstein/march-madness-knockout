@@ -43,16 +43,16 @@ app.use(bodyParser.json());
 
 
 app.post('/allusers', verifyToken, (req, res) => {
-  // db.query('SELECT * FROM `user_credentials`',
-  //   function (err, results) {
-  //     res.send(results); // results contains rows returned by server
-  //   }
-  // );
+  db.query('SELECT * FROM `user_credentials`',
+    function (err, results) {
+      res.send(results); // results contains rows returned by server
+    }
+  );
 
   jsonwebtoken.verify(req.token, process.env.JWT_TOKEN_SECRET, (err, user) => {
     console.log(req.token, user)
     if (err) return console.log('you do not have access, token incorrect')
-    res.json = ({ user })
+    // res.json = ({ user })
   })
 
 
